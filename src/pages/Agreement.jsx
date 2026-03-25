@@ -1,14 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 
 const Agreement = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
-      <Navbar />
-
+    <div className="w-full flex-1 flex flex-col font-sans bg-gray-100">
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center py-12 w-full">
         
@@ -87,11 +84,6 @@ const Agreement = () => {
         </div>
 
       </main>
-
-      {/* Simple Footer */}
-      <footer className="w-full h-16 bg-white border-t border-gray-200 flex items-center justify-center text-sm text-gray-500 mt-auto">
-        &copy; {new Date().getFullYear()} EbrajGR. All rights reserved.
-      </footer>
     </div>
   );
 };
