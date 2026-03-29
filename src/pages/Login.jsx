@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MOCK_USER } from '../constants/auth';
 import { AuthContext } from '../context/AuthContext';
 
@@ -199,9 +199,9 @@ const Login = () => {
             <a href="#" className="text-xs text-gray-800 hover:text-black transition-colors">
               Trouble logging in?
             </a>
-            <a href="#" className="text-xs text-gray-800 hover:text-black transition-colors">
+            <Link to="/register" className="text-xs text-gray-800 hover:text-black transition-colors hover:underline">
               Create account
-            </a>
+            </Link>
           </div>
 
         </div>
