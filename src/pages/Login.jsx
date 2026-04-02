@@ -1,19 +1,32 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { MOCK_USER } from '../constants/auth';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLogin } from '../hooks/useAuth';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [activeTab, setActiveTab] = useState('Main');
+  const [activeTab, setActiveTab] = useState('MAIN');
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useContext(AuthContext);
+  const location = useLocation();
+  const { mutate: login, isPending, isError, error: loginError } = useLogin();
+
+  React.useEffect(() => {
+    const savedIdentifier = localStorage.getItem(`ebraj_saved_identifier_${activeTab}`);
+    if (savedIdentifier) {
+      setIdentifier(savedIdentifier);
+      setRememberMe(true);
+    } else {
+      setIdentifier('');
+      setRememberMe(false);
+    }
+  }, [activeTab]);
+
+  // Show a rejection banner if redirected from public law page
+  const wasRejected = new URLSearchParams(location.search).get('rejected') === 'true';
 
   const handleClearIdentifier = () => {
     setIdentifier('');
@@ -28,12 +41,26 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    if (identifier === MOCK_USER.phone && password === MOCK_USER.password) {
-      setIsLoggedIn(true);
-      navigate('/home');
-    } else {
-      setError('Invalid credentials');
-    }
+    const payload = { identifier, password, loginType: activeTab };
+    console.log('Submitting login with loginType:', payload.loginType);
+
+    login(
+      payload,
+      {
+        onSuccess: (data) => {
+          if (rememberMe) {
+            localStorage.setItem(`ebraj_saved_identifier_${activeTab}`, identifier);
+          } else {
+            localStorage.removeItem(`ebraj_saved_identifier_${activeTab}`);
+          }
+          // Navigate to /home — ProtectedRoute will redirect to /public-law if law not agreed
+          navigate('/home');
+        },
+        onError: (err) => {
+          console.error('Login error:', err?.response?.data);
+        },
+      }
+    );
   };
 
   const isFormValid = identifier.trim() !== '' && password.trim() !== '';
@@ -47,9 +74,19 @@ const Login = () => {
         
         {/* Inside wrapper: The login form card */}
         <div className="w-full max-w-md bg-white rounded-lg border border-gray-300 shadow-sm p-8 relative">
-          
-          
 
+          {/* Rejection Banner */}
+          {wasRejected && (
+            <div className="mb-5 flex items-start gap-3 p-4 bg-amber-50 border border-amber-300 rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
+              </svg>
+              <div>
+                <p className="text-xs font-bold text-amber-800">Access Denied — Law Not Agreed</p>
+                <p className="text-xs text-amber-600 mt-1">You declined the Ebraj Public Law. You must agree to access the platform. Log in again to review and accept.</p>
+              </div>
+            </div>
+          )}
           {/* Card Header text-center */}
           <div className="text-center mb-3 mt-2">
             <h2 className="text-2xl font-bold text-gray-900 tracking-wide">Welcome</h2>
@@ -64,9 +101,9 @@ const Login = () => {
             <div className="flex border border-gray-300 rounded overflow-hidden">
               <button 
                 type="button"
-                onClick={() => setActiveTab('Main')}
+                onClick={() => setActiveTab('MAIN')}
                 className={`px-8 py-1 text-xs font-semibold transition-colors ${
-                  activeTab === 'Main' 
+                  activeTab === 'MAIN' 
                     ? 'bg-gray-400 text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
@@ -76,9 +113,9 @@ const Login = () => {
               <div className="w-[1px] bg-gray-300"></div>
               <button 
                 type="button"
-                onClick={() => setActiveTab('Secondary')}
+                onClick={() => setActiveTab('SECONDARY')}
                 className={`px-6 py-1 text-xs font-semibold transition-colors ${
-                  activeTab === 'Secondary' 
+                  activeTab === 'SECONDARY' 
                     ? 'bg-gray-400 text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
@@ -91,28 +128,15 @@ const Login = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Conditional Username Input (Secondary Tab) */}
-            {activeTab === 'Secondary' && (
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all placeholder:text-gray-500 text-gray-900"
-                  required
-                />
-              </div>
-            )}
-
             {/* Email / Phone */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Email, Phone number"
+                placeholder={activeTab === 'MAIN' ? "Email, Phone number" : "Username"}
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-4 pr-10 py-2.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all placeholder:text-gray-500 text-gray-900"
+                autoComplete="username"
                 required
               />
               {identifier && (
@@ -126,13 +150,6 @@ const Login = () => {
                   </svg>
                 </button>
               )}
-              {!identifier && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                  </svg>
-                </div>
-              )}
             </div>
 
             {/* Second Input: Password */}
@@ -143,6 +160,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-4 pr-10 py-2.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-all placeholder:text-gray-500 text-gray-900"
+                autoComplete="current-password"
                 required
               />
               <button
@@ -171,9 +189,9 @@ const Login = () => {
             </div>
 
             {/* Error Message */}
-            {error && (
+            {(error || isError) && (
               <div className="text-red-500 text-sm font-medium text-center pb-2">
-                {error}
+                {error || (loginError?.response?.data?.message || 'Login failed')}
               </div>
             )}
 
@@ -181,14 +199,14 @@ const Login = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isFormValid || isPending}
                 className={`px-10 py-2 text-xs font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isFormValid 
+                  (isFormValid && !isPending)
                     ? 'bg-black hover:bg-gray-800 text-white focus:ring-gray-900' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed flex justify-center'
                 }`}
               >
-                Login
+                {isPending ? 'Logging in...' : 'Login'}
               </button>
             </div>
             
@@ -196,9 +214,9 @@ const Login = () => {
 
           {/* Footer Text */}
           <div className="mt-8 flex flex-col items-center space-y-2">
-            <a href="#" className="text-xs text-gray-800 hover:text-black transition-colors">
+            <Link to="/forgot-password" title="Forgot Password" className="text-xs text-gray-800 hover:text-black transition-colors">
               Trouble logging in?
-            </a>
+            </Link>
             <Link to="/register" className="text-xs text-gray-800 hover:text-black transition-colors hover:underline">
               Create account
             </Link>

@@ -1,11 +1,14 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, NavLink } from 'react-router-dom';
 import logo from '../assets/Ebraj logo/logo.png';
-import { AuthContext } from '../context/AuthContext';
+import { useUser, useLogout } from '../hooks/useAuth';
+import IdentityBadge from './ui/IdentityBadge';
 
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const { data: user } = useUser();
+  const isLoggedIn = !!user;
+  const { mutate: logout } = useLogout();
   const navigate = useNavigate();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -22,9 +25,12 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsDropdownOpen(false);
-    navigate('/login');
+    logout(null, {
+      onSuccess: () => {
+        setIsDropdownOpen(false);
+        navigate('/login');
+      }
+    });
   };
 
   return (
@@ -78,6 +84,23 @@ const Navbar = () => {
           >
             Future
           </NavLink>
+
+          {/* Admin link — only visible to ADMIN role users */}
+          {user?.role === 'ADMIN' && (
+            <NavLink
+              to="/admin/users"
+              className={({ isActive }) =>
+                `text-sm transition-colors duration-200 focus:outline-none flex items-center gap-1.5 ${
+                  isActive ? "text-yellow-500 font-semibold" : "text-slate-200 font-medium hover:text-white"
+                }`
+              }
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path fillRule="evenodd" d="M2.5 3A1.5 1.5 0 001 4.5v4A1.5 1.5 0 002.5 10h6A1.5 1.5 0 0010 8.5v-4A1.5 1.5 0 008.5 3h-6zm11 2A1.5 1.5 0 0012 6.5v7a1.5 1.5 0 001.5 1.5h3A1.5 1.5 0 0018 13.5v-7A1.5 1.5 0 0016.5 5h-3zm-10 7A1.5 1.5 0 002 13.5v1A1.5 1.5 0 003.5 16h6a1.5 1.5 0 001.5-1.5v-1A1.5 1.5 0 009.5 12h-6z" clipRule="evenodd" />
+              </svg>
+              Admin
+            </NavLink>
+          )}
         </div>
       </div>
 
@@ -128,23 +151,20 @@ const Navbar = () => {
                 {/* Top Section */}
                 <div className="px-4 mb-4 flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-yellow-500 font-bold flex-shrink-0 text-sm">
-                    EJ
+                    {(user?.username || user?.fullName || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-gray-900 leading-tight">Wael Eldab3</span>
-                    <span className="text-sm text-gray-800 flex items-center mt-1">
-                      <div className="relative w-4 h-5 mr-2 flex-shrink-0 flex items-center justify-center">
-                        <img src={logo} alt="icon" className="w-full h-full object-contain" />
-                        <div className="absolute w-[130%] h-[1.5px] bg-red-600 -rotate-45 rounded-full"></div>
-                      </div>
-                      Non Ebrajer
-                    </span>
+                    <span className="text-sm font-bold text-gray-900 leading-tight">{user?.username || 'User'}</span>
+                    <IdentityBadge user={user} className="mt-1" />
                   </div>
                 </div>
 
                 {/* My Profile Button */}
                 <div className="px-4 mb-4">
-                  <button className="w-full py-1.5 text-xs font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button
+                    onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}
+                    className="w-full py-1.5 text-xs font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     My Profile
                   </button>
                 </div>
@@ -153,6 +173,15 @@ const Navbar = () => {
 
                 {/* Middle Menu Items */}
                 <div className="px-2 py-1 flex flex-col">
+                  {/* Manage Sub-Accounts - Only for Main Ebrajers */}
+                  {user?.verificationStatus === 'APPROVED' && !user?.parentId && (
+                    <button 
+                      onClick={() => { navigate('/sub-accounts'); setIsDropdownOpen(false); }}
+                      className="text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors w-full font-medium"
+                    >
+                      Team & Family
+                    </button>
+                  )}
                   <button className="text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors w-full">
                     eWallet
                   </button>
