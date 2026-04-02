@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import { publicLawSections } from '../constants/rulesData';
+import { policiesSections } from '../constants/policiesData';
+import { conditionsSections } from '../constants/conditionsData';
+import { recommendationsSections } from '../constants/recommendationsData';
+import FaqSection from '../components/FaqSection';
 
 const PublicLaw = () => {
   const [activeTab, setActiveTab] = useState('rules');
@@ -21,6 +26,17 @@ const PublicLaw = () => {
 The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
 
             </p>
+            
+            <div className="flex flex-col w-full pb-8">
+              {publicLawSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
           </div>
         );
       case 'policies':
@@ -31,6 +47,17 @@ The white paper of Ebraj Company is an official document that outlines its visio
               The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
 
             </p>
+            
+            <div className="flex flex-col w-full pb-8">
+              {policiesSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
           </div>
         );
       case 'conditions':
@@ -41,6 +68,17 @@ The white paper of Ebraj Company is an official document that outlines its visio
               The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
 
             </p>
+
+            <div className="flex flex-col w-full pb-8 mt-6">
+              {conditionsSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
           </div>
         );
       case 'recommendations':
@@ -50,6 +88,17 @@ The white paper of Ebraj Company is an official document that outlines its visio
             <p className="text-gray-600 leading-relaxed">
              The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity
             </p>
+
+            <div className="flex flex-col w-full pb-8 mt-6">
+              {recommendationsSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+            
           </div>
         );
       default:
