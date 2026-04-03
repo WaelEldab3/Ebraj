@@ -216,9 +216,8 @@ const UserVerification = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleAction(user.id, 'APPROVED')}
-                            disabled={isThisRowUpdating || !user.agreedToLaw}
-                            title={!user.agreedToLaw ? "User must accept Public Law before approval" : ""}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            disabled={isThisRowUpdating}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
                           >
                             {isThisRowUpdating && variables?.status === 'APPROVED' ? (
                               <span className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />

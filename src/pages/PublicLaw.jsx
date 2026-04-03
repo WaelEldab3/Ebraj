@@ -1,150 +1,171 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLawResponse, useLogout } from '../hooks/useAuth';
-
-const PUBLIC_LAW_CONTENT = `The white paper of Ebraj Company is an official document that serves as a comprehensive guide to our Unified Identity and Financial System.
-
-It details the technical specifications, organizational structure, and legal framework that govern the operations of Ebraj. By participating in this ecosystem, every user and entity agrees to adhere to the core principles of transparency, security, and mutual trust.`;
-
-const LAW_SECTIONS = [
-  {
-    title: 'SECTION 1 — RULES',
-    body: 'The fundamental code of conduct for all Ebraj members. Every user must maintain the integrity of their digital identity and may not attempt to impersonate, duplicate, or misrepresent their account status within the platform.',
-  },
-  {
-    title: 'SECTION 2 — POLICIES',
-    body: 'Operational guidelines for all financial and data interactions within the Ebraj ecosystem. All transactions are immutable and subject to platform-level auditing. Users consent to data processing necessary for identity verification.',
-  },
-  {
-    title: 'SECTION 3 — CONDITIONS',
-    body: 'Specific criteria for account eligibility and verification. A verified "Ebrajer" is a user whose identity has been reviewed and approved by an authorized Ebraj administrator. Secondary accounts operate under the guarantee of their parent Ebrajer.',
-  },
-  {
-    title: 'SECTION 4 — RECOMMENDATIONS',
-    body: 'Best practices for platform security and system optimization. Users are strongly encouraged to enable multi-factor authentication, use secure passphrases, and review their account activity regularly.',
-  },
-  {
-    title: 'ARTICLE 5 — ACCEPTANCE & ENFORCEMENT',
-    body: 'Acceptance of this Public Law is mandatory for all users wishing to access Ebraj platform features. Failure to comply with these terms may result in account suspension or permanent deactivation at the discretion of Ebraj administrators.',
-  },
-];
+import { publicLawSections } from '../constants/rulesData';
+import { policiesSections } from '../constants/policiesData';
+import { conditionsSections } from '../constants/conditionsData';
+import { recommendationsSections } from '../constants/recommendationsData';
+import FaqSection from '../components/FaqSection';
 
 const PublicLaw = () => {
-  const navigate = useNavigate();
-  const { mutate: lawResponse, isPending } = useLawResponse();
-  const { mutate: logout } = useLogout();
-  const [activeAction, setActiveAction] = useState(null); // 'AGREE' | 'REJECT'
-  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState('rules');
 
-  const handleAgree = () => {
-    setActiveAction('AGREE');
-    lawResponse('AGREE', {
-      onSuccess: () => {
-        navigate('/verify-account');
-      },
-    });
-  };
+  const tabs = [
+    { id: 'rules', label: 'Rules' },
+    { id: 'policies', label: 'Policies' },
+    { id: 'conditions', label: 'Conditions' },
+    { id: 'recommendations', label: 'Recommendations' },
+  ];
 
-  const handleConfirmReject = () => {
-    setShowRejectConfirm(false);
-    setActiveAction('REJECT');
-    lawResponse('REJECT', {
-      onSuccess: () => {
-        logout(null, {
-          onSuccess: () => {
-            navigate('/login?rejected=true', { replace: true });
-          },
-        });
-      },
-    });
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'rules':
+        return (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Rules</h2>
+            <p className="text-gray-600 leading-relaxed">
+              
+The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
+
+            </p>
+            
+            <div className="flex flex-col w-full pb-8">
+              {publicLawSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
+          </div>
+        );
+      case 'policies':
+        return (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Policies</h2>
+            <p className="text-gray-600 leading-relaxed">
+              The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
+
+            </p>
+            
+            <div className="flex flex-col w-full pb-8">
+              {policiesSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
+          </div>
+        );
+      case 'conditions':
+        return (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Rules</h2>
+            <p className="text-gray-600 leading-relaxed">
+              The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity.
+
+            </p>
+
+            <div className="flex flex-col w-full pb-8 mt-6">
+              {conditionsSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+
+          </div>
+        );
+      case 'recommendations':
+        return (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Recommendations</h2>
+            <p className="text-gray-600 leading-relaxed">
+             The white paper of Ebraj Company is an official document that outlines its vision, operating mechanism, and economic model based on sustainability, transparency, and social solidarity
+            </p>
+
+            <div className="flex flex-col w-full pb-8 mt-6">
+              {recommendationsSections.map((section) => (
+                <FaqSection 
+                  key={section.id} 
+                  title={section.title} 
+                  questions={section.questions} 
+                />
+              ))}
+            </div>
+            
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 flex flex-col items-center justify-center font-sans">
-      
-      <div className="w-full max-w-3xl bg-white p-8 sm:p-12 shadow-sm border border-gray-200">
+    <div className="w-full flex-1 flex flex-col font-sans bg-gray-50 min-h-screen">
+      <main className="flex-1 flex flex-col py-10 w-full">
         
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Public Law</h1>
-        </div>
-
-        {/* Intro */}
-        <div className="mb-10 text-gray-800 text-sm sm:text-base leading-relaxed space-y-4">
-          <p>The white paper of Ebraj Company is an official document that serves as a comprehensive guide to our Unified Identity and Financial System.</p>
-          <p>It details the technical specifications, organizational structure, and legal framework that govern the operations of Ebraj. By participating in this ecosystem, every user and entity agrees to adhere to the core principles of transparency, security, and mutual trust.</p>
-        </div>
-
-        {/* Document Sections */}
-        <div className="space-y-8 mb-12">
-          {LAW_SECTIONS.map((section, idx) => (
-            <div key={idx} className="space-y-2">
-              <h3 className="text-base font-bold text-gray-900 uppercase tracking-widest">{section.title}</h3>
-              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{section.body}</p>
+        {/* Top Section */}
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 mb-10 relative">
+          
+          {/* World Header Label - FAR LEFT */}
+          <div className="sm:absolute left-4 sm:left-8 top-0 mb-6 sm:mb-0 flex justify-center sm:justify-start">
+            <div className="flex items-center space-x-2 text-gray-500 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+              <span className="text-sm tracking-widest uppercase">World</span>
             </div>
-          ))}
-        </div>
-
-        {/* Selection / Action Buttons */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-            
-            {/* Agree Button */}
-            <button
-              id="btn-agree-public-law"
-              onClick={handleAgree}
-              disabled={isPending}
-              className="w-full sm:w-auto px-8 py-3.5 bg-blue-900 text-white text-sm font-semibold hover:bg-blue-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2 rounded-sm"
-            >
-              {isPending && activeAction === 'AGREE' && (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              )}
-              I Agree and Accept the Public Law
-            </button>
-
-            {/* Decline Button */}
-            <button
-              id="btn-reject-public-law"
-              onClick={() => setShowRejectConfirm(true)}
-              disabled={isPending}
-              className="w-full sm:w-auto px-8 py-3.5 bg-transparent text-gray-900 text-sm font-semibold border-2 border-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2 rounded-sm"
-            >
-              {isPending && activeAction === 'REJECT' && (
-                <span className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-              )}
-              I Do Not Agree
-            </button>
-
           </div>
-        </div>
-      </div>
 
-      {/* Rejection Confirmation Modal (kept minimalist) */}
-      {showRejectConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-w-md w-full p-8 text-center border border-gray-200 shadow-xl">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Decline Public Law?</h2>
-            <p className="text-sm text-gray-700 mb-6 leading-relaxed">
-              Acceptance of the Ebraj Public Law is mandatory to use our services. Declining will sign you out immediately.
+          {/* Center Title */}
+          <div className="text-center sm:pt-2">
+            <h1 className="text-3xl sm:text-2xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Public law
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Read through our comprehensive public law documentation to understand the established frameworks 
+              and community guidelines associated with the Ebraj platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setShowRejectConfirm(false)}
-                className="flex-1 px-5 py-3 bg-gray-100 text-gray-900 text-sm font-bold hover:bg-gray-200 transition-colors cursor-pointer rounded-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmReject}
-                disabled={isPending}
-                className="flex-1 px-5 py-3 bg-rose-700 text-white text-sm font-bold hover:bg-rose-800 transition-colors disabled:opacity-60 cursor-pointer rounded-sm"
-              >
-                {isPending && activeAction === 'REJECT' ? 'Signing out...' : 'Decline & Sign Out'}
-              </button>
-            </div>
           </div>
         </div>
-      )}
+
+        {/* Tabs Container */}
+        <div className="w-full border-b border-gray-200">
+          <div className="max-w-4xl mx-auto px-4 flex justify-center space-x-6 sm:space-x-12">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`pb-4 text-sm sm:text-base font-semibold transition-colors focus:outline-none relative whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'text-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.label}
+                {/* Active Underline */}
+                {activeTab === tab.id && (
+                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gray-900 rounded-t-md"></span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-12">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-12 min-h-[250px] flex flex-col justify-center">
+            {renderContent()}
+          </div>
+        </div>
+
+      </main>
     </div>
   );
 };

@@ -247,7 +247,6 @@ const Profile = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
             <ProfileField label="Username"      value={user?.username} />
             <ProfileField label="Full Name"     value={user?.fullName} />
-            <ProfileField label="Preferred Name" value={user?.preferredName} />
             <ProfileField label="Email"         value={user?.email} />
             <ProfileField label="Phone"         value={user?.phone} />
             <ProfileField label="Role"          value={user?.role} />

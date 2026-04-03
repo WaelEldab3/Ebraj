@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSubAccounts, useCreateSubAccount } from '../hooks/useAuth';
+import IdentityBadge from '../components/ui/IdentityBadge';
 
 const SubAccounts = () => {
   const { data: subAccounts = [], isLoading, isError } = useSubAccounts();
@@ -13,6 +14,32 @@ const SubAccounts = () => {
     fullName: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case 'APPROVED':
+        return {
+          label: 'APPROVED',
+          container: 'text-emerald-600 bg-emerald-50 border-emerald-100',
+          dot: 'bg-emerald-500'
+        };
+      case 'REJECTED':
+        return {
+          label: 'REJECTED',
+          container: 'text-rose-600 bg-rose-50 border-rose-100',
+          dot: 'bg-rose-500'
+        };
+      case 'PENDING_REVIEW':
+      case 'UNVERIFIED':
+      default:
+        return {
+          label: 'PENDING',
+          container: 'text-amber-600 bg-amber-50 border-amber-100',
+          dot: 'bg-amber-500'
+        };
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,9 +49,14 @@ const SubAccounts = () => {
     e.preventDefault();
     setError('');
     createSubAccount(formData, {
-      onSuccess: () => {
-        setIsModalOpen(false);
+      onSuccess: (data) => {
+        setSuccess(data?.message || 'Sub-account created successfully');
         setFormData({ username: '', email: '', password: '', fullName: '' });
+        // Close modal after a short delay to let user read the success state
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setSuccess('');
+        }, 3000);
       },
       onError: (err) => {
         setError(err?.response?.data?.message || 'Failed to create sub-account');
@@ -43,6 +75,25 @@ const SubAccounts = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-8">
       <div className="max-w-6xl mx-auto">
+        {/* Success Toast */}
+        {success && !isModalOpen && (
+          <div className="mb-6 animate-fade-in-down">
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-md">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4.13-5.68z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium">{success}</p>
+              <button onClick={() => setSuccess('')} className="ml-auto text-emerald-400 hover:text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Family & Team Accounts</h1>
@@ -76,34 +127,45 @@ const SubAccounts = () => {
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Name</th>
-                <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Username</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Email</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Status</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Created</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {subAccounts.map((account) => (
-                <tr key={account.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3 text-slate-800 font-medium">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase">
-                        {account.fullName[0]}
+              {subAccounts.map((account) => {
+                const styles = getStatusStyles(account.verificationStatus);
+                return (
+                  <tr key={account.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        {/* Avatar */}
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm uppercase flex-shrink-0 shadow-sm border border-slate-200/50">
+                          {account.fullName[0]}
+                        </div>
+                        {/* Name & Badge Stack */}
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-slate-800 tracking-tight">{account.fullName}</span>
+                            <IdentityBadge user={account} className="transform scale-90 origin-left" />
+                          </div>
+                          <span className="text-[11px] font-mono text-slate-400">@{account.username}</span>
+                        </div>
                       </div>
-                      {account.fullName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-500 font-mono text-xs">@{account.username}</td>
-                  <td className="px-6 py-4 text-slate-500">{account.email}</td>
-                  <td className="px-6 py-4 text-emerald-600 font-semibold text-xs flex items-center gap-1.5 leading-none">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    APPROVED
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-xs">
-                    {new Date(account.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 text-slate-500 text-sm">{account.email}</td>
+                    <td className="px-6 py-4">
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${styles.container} font-semibold text-[10px] tracking-wide`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${styles.dot}`} />
+                        {styles.label}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-slate-400 text-xs">
+                      {new Date(account.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </td>
+                  </tr>
+                );
+              })}
               {subAccounts.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic font-medium">

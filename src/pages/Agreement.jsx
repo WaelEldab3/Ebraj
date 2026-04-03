@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLawResponse } from '../hooks/useAuth';
 
 const Agreement = () => {
   const navigate = useNavigate();
+  const [activeAction, setActiveAction] = useState(null); // 'AGREE' | 'DISAGREE'
+  const { mutate: sendResponse, isPending } = useLawResponse();
+
+  const handleAction = (action) => {
+    if (isPending) return;
+    setActiveAction(action);
+
+    sendResponse(action, {
+      onSuccess: () => {
+        if (action === 'AGREE') {
+          navigate('/home');
+        } else {
+          navigate('/thank-you');
+        }
+      }
+    });
+  };
 
   return (
     <div className="w-full flex-1 flex flex-col font-sans bg-gray-100">
@@ -68,17 +86,29 @@ const Agreement = () => {
           {/* Card Footer */}
           <div className="p-6 sm:px-10 sm:py-8 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 flex-shrink-0">
             <button 
-              onClick={() => navigate('/thank-you')}
-              className="w-full sm:w-auto px-8 py-3 text-sm font-semibold bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              onClick={() => handleAction('DISAGREE')}
+              disabled={isPending}
+              className="w-full sm:w-auto px-8 py-3 text-sm font-semibold bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center min-w-[140px]"
             >
-              I Disagree
+              {isPending && activeAction === 'DISAGREE' ? (
+                <svg className="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : 'I Disagree'}
             </button>
             
             <button 
-              onClick={() => navigate('/home')}
-              className="w-full sm:w-auto px-8 py-3 text-sm font-semibold bg-blue-600 text-white rounded-full hover:bg-blue-700 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              onClick={() => handleAction('AGREE')}
+              disabled={isPending}
+              className="w-full sm:w-auto px-8 py-3 text-sm font-semibold bg-blue-600 text-white rounded-full hover:bg-blue-700 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 flex items-center justify-center min-w-[140px]"
             >
-              I Agree
+              {isPending && activeAction === 'AGREE' ? (
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : 'I Agree'}
             </button>
           </div>
         </div>

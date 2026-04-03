@@ -28,10 +28,10 @@ const ProtectedRoute = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Loading…</p>
+          <div className="w-8 h-8 border-2 border-blue-900/10 border-t-blue-900 rounded-full animate-spin" />
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Loading…</p>
         </div>
       </div>
     );
@@ -47,21 +47,18 @@ const ProtectedRoute = ({ children }) => {
 
   // If the user IS verified but tries to access /verify-account, rescue them (send to law or home)
   if (user.isVerified && location.pathname === '/verify-account') {
-    return <Navigate to={user.agreedToLaw ? "/home" : "/public-law"} replace />;
+    return <Navigate to={user.agreedToLaw ? "/home" : "/"} replace />;
   }
 
   // 3. Law Agreement Gate:
-  if (!user.agreedToLaw && location.pathname !== '/public-law') {
+  if (!user.agreedToLaw && location.pathname !== '/') {
     // Note: Don't redirect if we are already on /verify-account (handled above)
     if (location.pathname !== '/verify-account') {
-      return <Navigate to="/public-law" replace />;
+      return <Navigate to="/" replace />;
     }
   }
 
-  // If the user HAS agreed and tries to access /public-law → send to /home
-  if (user.agreedToLaw && location.pathname === '/public-law') {
-    return <Navigate to="/home" replace />;
-  }
+  // Note: /public-law is now an informational resource accessible to all logged-in users.
 
   // 4. Pending Approval Gate (Strictly applied to Secondary Accounts for now)
   if (user.parentId && user.agreedToLaw && user.verificationStatus === 'PENDING_REVIEW') {
@@ -85,13 +82,13 @@ const AdminRoute = ({ children }) => {
   const { data: user, isLoading } = useUser();
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e]">
-        <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-blue-900/10 border-t-blue-900 rounded-full animate-spin" />
       </div>
     );
   }
   if (!user) return <Navigate to="/login" replace />;
-  if (!user.agreedToLaw) return <Navigate to="/public-law" replace />;
+  if (!user.agreedToLaw) return <Navigate to="/" replace />;
   if (user.role !== 'ADMIN') return <Navigate to="/home" replace />;
   return children;
 };
@@ -103,13 +100,13 @@ const EbrajerRoute = ({ children }) => {
   const { data: user, isLoading } = useUser();
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e]">
-        <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-blue-900/10 border-t-blue-900 rounded-full animate-spin" />
       </div>
     );
   }
   if (!user) return <Navigate to="/login" replace />;
-  if (!user.agreedToLaw) return <Navigate to="/public-law" replace />;
+  if (!user.agreedToLaw) return <Navigate to="/" replace />;
   if (user.verificationStatus !== 'APPROVED' || user.parentId) return <Navigate to="/profile" replace />;
   return children;
 };
