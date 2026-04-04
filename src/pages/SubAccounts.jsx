@@ -10,6 +10,7 @@ const SubAccounts = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    phone: '',
     password: '',
     fullName: '',
   });
@@ -51,7 +52,7 @@ const SubAccounts = () => {
     createSubAccount(formData, {
       onSuccess: (data) => {
         setSuccess(data?.message || 'Sub-account created successfully');
-        setFormData({ username: '', email: '', password: '', fullName: '' });
+        setFormData({ username: '', email: '', phone: '', password: '', fullName: '' });
         // Close modal after a short delay to let user read the success state
         setTimeout(() => {
           setIsModalOpen(false);
@@ -128,6 +129,7 @@ const SubAccounts = () => {
               <tr>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Name</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Email</th>
+                <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Phone</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Status</th>
                 <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs">Created</th>
               </tr>
@@ -154,6 +156,7 @@ const SubAccounts = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-500 text-sm">{account.email}</td>
+                    <td className="px-6 py-4 text-slate-500 text-sm whitespace-nowrap">{account.phone || '—'}</td>
                     <td className="px-6 py-4">
                       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${styles.container} font-semibold text-[10px] tracking-wide`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${styles.dot}`} />
@@ -168,7 +171,7 @@ const SubAccounts = () => {
               })}
               {subAccounts.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic font-medium">
                     No secondary accounts created yet.
                   </td>
                 </tr>
@@ -218,6 +221,17 @@ const SubAccounts = () => {
                   required
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-sm"
                   placeholder="john.jr@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1.5 ml-1">Phone Number</label>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-sm"
+                  placeholder="+1 (555) 000-0000"
                 />
               </div>
               <div>

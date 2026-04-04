@@ -25,15 +25,18 @@ const ForgotPassword = () => {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-xl p-10 text-center">
-          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-blue-100">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+      <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-md w-full border border-gray-100 shadow-sm p-10 rounded-[32px]">
+          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-10 h-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Email Sent!</h2>
-          <p className="text-slate-500 mt-2">Check your inbox for a 6-digit recovery code. Redirecting you to reset page...</p>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-4 leading-tight">Email Sent!</h2>
+          <p className="text-gray-600 text-base leading-relaxed mb-8">Check your inbox for a 6-digit recovery code. Redirecting you to the reset page...</p>
+          <div className="flex justify-center">
+            <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+          </div>
         </div>
       </div>
     );

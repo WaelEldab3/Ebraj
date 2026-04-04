@@ -80,10 +80,10 @@ const VerifyAccount = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-4 font-sans">
+    <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 text-center font-sans transition-all duration-500 animate-fade-in">
       <div className="w-full max-w-md">
         {/* Minimalist Card */}
-        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm p-10 md:p-12 text-center">
+        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-10 md:p-12 text-center">
           
           <div className="mb-10">
             <div className="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl rotate-3 hover:rotate-0 transition-transform duration-300">

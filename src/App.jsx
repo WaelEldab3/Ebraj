@@ -120,16 +120,21 @@ const App = () => {
       <Routes>
         <Route element={<MainLayout />}>
           {/* Public routes — no auth required */}
-          <Route path="/" element={<Agreement />} />
+          
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
+
           {/* The Law Gate — requires auth but NOT agreedToLaw */}
           <Route path="/public-law" element={
             <ProtectedRoute><PublicLaw /></ProtectedRoute>
+          } />
+
+          <Route path="/" element={
+            <ProtectedRoute>  <Agreement /> </ProtectedRoute>
           } />
 
           {/* Pending Approval Gate */}

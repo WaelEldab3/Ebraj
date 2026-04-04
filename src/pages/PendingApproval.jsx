@@ -1,13 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLogout, useUser } from '../hooks/useAuth';
 
 const PendingApproval = () => {
   const { data: user } = useUser();
+  const navigate = useNavigate();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
+  const handleLogout = () => {
+    logout(null, {
+      onSuccess: () => {
+        navigate('/login', { replace: true });
+      }
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
-      <div className="max-w-xl w-full bg-white p-8 sm:p-12 shadow-sm border border-gray-200 text-center">
+    <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-6 text-center font-sans">
+      <div className="max-w-xl w-full border border-gray-100 shadow-sm p-8 sm:p-12 rounded-[32px]">
         
         {/* Status Icon */}
         <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-6">
@@ -33,16 +43,20 @@ const PendingApproval = () => {
           </p>
         </div>
 
-        <div className="pt-6 border-t border-gray-200">
+        <div className="pt-6 border-t border-gray-200 flex flex-col items-center gap-3">
           <button
-            onClick={() => logout()}
+            onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full sm:w-auto px-8 py-3 bg-white text-gray-900 text-sm font-semibold border-2 border-gray-900 hover:bg-gray-50 transition-colors disabled:opacity-60 cursor-pointer flex items-center justify-center mx-auto gap-2"
+            className="px-10 py-3 bg-gray-900 text-white text-sm font-bold rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl active:scale-95 disabled:opacity-50 flex items-center gap-2 group"
           >
-            {isLoggingOut && (
-              <span className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+            {isLoggingOut ? (
+              <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:-translate-x-1 transition-transform">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
             )}
-            Sign Out
+            {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
           </button>
         </div>
 
